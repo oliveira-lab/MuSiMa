@@ -21,7 +21,7 @@ This tool is particularly suited for genomic analyses where understanding motif 
 ## Dependencies
 MuSiMa automatically checks for and installs the following R packages if they are not already present:
 - **CRAN**: `seqinr`, `circlize`, `dplyr`, `parallel`
-- **Bioconductor**: `Biostrings`, `ComplexHeatmap`, `BiocManager` (for installation)
+- **Bioconductor**: `Biostrings`, `ComplexHeatmap`, `BiocManager`
 
 ## Installation and running
 1. Ensure R is installed on your system (version 4.0 or higher recommended).
