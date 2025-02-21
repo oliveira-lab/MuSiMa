@@ -5,7 +5,7 @@ This repository contains an R script (`musima.R`) designed to analyze DNA sequen
 ## Purpose
 MuSiMa:
 - Identifies positions of a user-specified motif across multiple DNA sequences provided in FASTA format.
-- Calculates observed versus expected motif occurrences in sliding windows of varying sizes (50 to 500 kb) with a 10 kb step.
+- Calculates observed versus expected motif occurrences in sliding windows of varying sizes (50 to 500 kb) with a 10 kb step. Innermost layer corresponds to the smallest window size. The expected motif occurrence is computed as the product of the genome-wide motif frequency and the number of potential motif sites within each window, under a null model of uniform random distribution across the sequence.
 - Computes z-scores to assess statistical significance of motif enrichment or depletion.
 - Generates a circular visualization saved as a PDF file (`musima_plot.pdf`).
 
@@ -29,10 +29,16 @@ MuSiMa automatically checks for and installs the following R packages if they ar
    ```bash
    git clone https://github.com/oliveira-lab/musima.git
    cd musima
+3. Run it as:
+   ```bash
    Rscript musima.R FASTA1 FASTA2 ... FASTAN Motif
 
 ## Output
 A PDF file named musima_plot.pdf containing a circular plot of z-scores across chromosomes for multiple window sizes (50–500 kb).
+
+![Output Musima](/test/musima_plot.jpg "GATC distribution across E. coli MG1655, R. solanacearum GMI1000, and C. difficile 630")
+
+In this example, we produced a circular plot of z-scores for GATC over / under abundance in the main chromosomes of <em>E. coli</em> MG1655, <em>R. solanacearum</em> GMI1000, and <em>C. difficile</em> 630.
 
 ## License and citing
 This project is licensed under the MIT License. See the LICENSE file for details. Please cite MuSiMa by including the link to https://github.com/oliveira-lab/musima.git.
