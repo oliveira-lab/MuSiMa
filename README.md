@@ -5,9 +5,9 @@ This repository contains an R script (`musima.R`) designed to analyze DNA sequen
 ## Purpose
 MuSiMa:
 - Identifies positions of a user-specified motif across multiple DNA sequences provided in FASTA format.
-- Calculates observed versus expected motif occurrences in sliding windows of varying sizes (50 to 500 kb) with a 10 kb step. Innermost layer corresponds to the smallest window size. The expected motif occurrence is computed as the product of the genome-wide motif frequency and the number of potential motif sites within each window, under a null model of uniform random distribution across the sequence.
+- Calculates observed versus expected motif occurrences in sliding windows of varying sizes (user defined) with a given step (also user defined). Innermost layer corresponds to the smallest window size. The expected motif occurrence is computed as the product of the genome-wide motif frequency and the number of potential motif sites within each window, under a null model of uniform random distribution across the sequence.
 - Computes z-scores to assess statistical significance of motif enrichment or depletion.
-- Generates a circular visualization saved as a PDF file (`musima_plot.pdf`).
+- Generates a circular visualization saved as a PDF file (`musima_plot.pdf`) and prints the raw z-score values for each window as a TXT file (`results_list.txt`).
 
 This tool is particularly suited for genomic analyses where understanding motif distribution across chromosomes or contigs is of interest.
 
@@ -15,7 +15,7 @@ This tool is particularly suited for genomic analyses where understanding motif 
 - **Input Files**: MuSiMa assumes that all provided FASTA files are valid, single-sequence DNA files. Multi-sequence FASTA files are not supported (only the first sequence is used).
 - **Motif**: The motif is a valid DNA string, potentially including IUPAC degenerate codes (e.g., "ATGC" or "AT[G|C]C"). It is case-insensitive (converted to uppercase internally).
 - **Environment**: An R installation with internet access is required to install missing packages. MuSiMa uses Bioconductor packages (`Biostrings`, `ComplexHeatmap`) and CRAN packages (`seqinr`, `circlize`, etc.).
-- **Sequence Length**: Sequences should be long enough to accommodate the largest window size (500 kb by default) for meaningful analysis. Subsequent versions will allow the user to finetune these parameters.
+- **Sequence Length**: Sequences should be long enough to accommodate the largest window size (10 times smaller as a rule of thumb) for meaningful analysis.
 - **Hardware**: Parallel processing is utilized, assuming a multi-core system (uses all but one core).
 
 ## Dependencies
@@ -31,14 +31,14 @@ MuSiMa automatically checks for and installs the following R packages if they ar
    cd musima
 3. Run it as:
    ```bash
-   Rscript musima.R FASTA1 FASTA2 ... FASTAN Motif
+   Rscript musima.R FASTA1 FASTA2 ... FASTAN Motif window_size1,window_size2,...,window_sizeN step_size
 
 ## Output
-A PDF file named musima_plot.pdf containing a circular plot of z-scores across chromosomes for multiple window sizes (50–500 kb).
+A PDF file named musima_plot.pdf containing a circular plot of z-scores across chromosomes for multiple window sizes and a given step size (user defined).
 
 ![Output Musima](/test/musima_plot.jpg "GATC distribution across E. coli MG1655, R. solanacearum GMI1000, and C. difficile 630")
 
-In this example, we produced a circular plot of z-scores for GATC over / under abundance in the main chromosomes of <em>E. coli</em> MG1655, <em>R. solanacearum</em> GMI1000, and <em>C. difficile</em> 630.
+In this example, we produced a circular plot of z-scores for GATC over / under abundance in the main chromosomes of <em>E. coli</em> MG1655, <em>R. solanacearum</em> GMI1000, and <em>C. difficile</em> 630 using window sizes 500000, 400000, 300000, 200000, 100000, 90000, 80000, 70000, 60000, 50000 and a step size of 10000.
 
 ## License and citing
 This project is licensed under the MIT License. See the LICENSE file for details. Please cite MuSiMa by including the link to https://github.com/oliveira-lab/musima.git.
