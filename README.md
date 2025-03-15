@@ -50,4 +50,4 @@ A PDF file named musima_plot_MOTIF.pdf containing a circular plot of z-scores ac
 In this example, we produced a circular plot of z-scores for GATC over / under abundance in the main chromosomes of <em>E. coli</em> MG1655, <em>R. solanacearum</em> GMI1000, and <em>C. difficile</em> 630 using window sizes 500000, 400000, 300000, 200000, 100000, 90000, 80000, 70000, 60000, 50000, a step size of 10000, and a 'uniform' background model.
 
 ## License and citing
-This project is licensed under the MIT License. See the LICENSE file for details. Please cite MuSiMa by including the link to https://github.com/oliveira-lab/musima.git.
+This project is licensed under a GPL-3.0 License. See the LICENSE file for details. Please cite MuSiMa by including the link to https://github.com/oliveira-lab/musima.git.
