@@ -29,13 +29,20 @@ suppressPackageStartupMessages({
 
 # --- Define Command-Line Options ---
 option_list <- list(
-  make_option(c("-f", "--fasta"), type = "character", help = "Comma-separated list of FASTA files"),
-  make_option(c("-m", "--motif"), type = "character", help = "Motif string or file with motifs (one per line)"),
-  make_option(c("-w", "--windows"), type = "character", help = "Comma-separated list of window sizes"),
-  make_option(c("-s", "--step"), type = "integer", help = "Step size for sliding windows"),
-  make_option(c("-t", "--method"), type = "character", help = "Method: 'uniform' or 'markov'"),
-  make_option(c("-o", "--order"), type = "character", help = "Order for Markov method, or 'NA' for uniform"),
-  make_option(c("-c", "--cores"), type = "integer", default = NULL, help = "Number of cores [default: all - 1]")
+  make_option(c("-f", "--fasta"), type = "character", 
+              help = "Comma-separated list of FASTA files (each can be a multifasta file containing multiple sequences)"),
+  make_option(c("-m", "--motif"), type = "character", 
+              help = "Motif string or file with motifs (one per line)"),
+  make_option(c("-w", "--windows"), type = "character", 
+              help = "Comma-separated list of window sizes"),
+  make_option(c("-s", "--step"), type = "integer", 
+              help = "Step size for sliding windows"),
+  make_option(c("-t", "--method"), type = "character", 
+              help = "Method: 'uniform' or 'markov'"),
+  make_option(c("-o", "--order"), type = "character", 
+              help = "Order for Markov method, or 'NA' for uniform"),
+  make_option(c("-c", "--cores"), type = "integer", default = NULL, 
+              help = "Number of cores [default: all - 1]")
 )
 
 # Parse arguments
@@ -56,7 +63,8 @@ if (any(is.na(window_sizes)) || any(window_sizes <= 0)) stop("Error: Window size
 if (is.na(step_size) || step_size <= 0) stop("Error: Step size must be a positive integer.")
 if (!method %in% c("uniform", "markov")) stop("Error: Method must be 'uniform' or 'markov'.")
 if (method == "uniform" && order_str != "NA") stop("Error: For uniform method, order must be 'NA'.")
-if (method == "markov" && (is.na(as.integer(order_str)) || as.integer(order_str) < 0)) stop("Error: For Markov method, order must be a non-negative integer.")
+if (method == "markov" && (is.na(as.integer(order_str)) || as.integer(order_str) < 0)) 
+  stop("Error: For Markov method, order must be a non-negative integer.")
 order <- if (method == "uniform") NA else as.integer(order_str)
 
 # Set cores for parallel processing
@@ -68,10 +76,17 @@ motifs <- if (file.exists(motif_input)) readLines(motif_input) else strsplit(mot
 
 # --- Function Definitions ---
 
-# Load FASTA sequence
-load_fasta_sequence <- function(fasta_file) {
-  seq <- read.fasta(fasta_file, as.string = TRUE, forceDNAtolower = FALSE)[[1]]
-  DNAString(toupper(as.character(seq)))
+# Load all sequences from FASTA files
+load_all_sequences <- function(fasta_files) {
+  # Read all sequences from each file
+  all_sequences <- lapply(fasta_files, read.fasta, as.string = TRUE, forceDNAtolower = FALSE)
+  # Combine into a single list
+  combined_sequences <- do.call(c, all_sequences)
+  # Convert each sequence to DNAString
+  dna_sequences <- lapply(combined_sequences, function(seq) DNAString(toupper(as.vector(seq))))
+  # Extract sequence names from FASTA headers
+  sequence_names <- names(combined_sequences)
+  list(dna_sequences = dna_sequences, sequence_names = sequence_names)
 }
 
 # Find motif positions (supports IUPAC degenerate codes)
@@ -172,7 +187,7 @@ calc_expected_motif <- function(dna_seq, motif, window_size, method, order) {
 }
 
 # Process window size
-process_window_size <- function(window_size, dna_sequences, motif, step_size, method, order, motif_counts_list, fasta_names) {
+process_window_size <- function(window_size, dna_sequences, motif, step_size, method, order, motif_counts_list, sequence_names) {
   cat(sprintf("Processing window size: %d for motif: %s\n", window_size, motif))
   results <- data.frame()
   offset <- 0
@@ -195,7 +210,7 @@ process_window_size <- function(window_size, dna_sequences, motif, step_size, me
       sd <- sqrt(n * p_motif * (1 - p_motif))
       z_score <- if (sd == 0) 0 else (observed - expected) / sd
       results <- rbind(results, data.frame(
-        chrom = fasta_names[chr_index], start = window_start, end = window_end,
+        chrom = sequence_names[chr_index], start = window_start, end = window_end,
         observed = observed, expected = expected, sd = sd, z_score = z_score
       ))
     }
@@ -206,23 +221,27 @@ process_window_size <- function(window_size, dna_sequences, motif, step_size, me
 
 # --- Main Processing Loop ---
 summary_df <- data.frame()
+
+# Load all sequences and their names
+seq_data <- load_all_sequences(fasta_files)
+dna_sequences <- seq_data$dna_sequences
+sequence_names <- seq_data$sequence_names
+
 for (motif in motifs) {
   motif <- toupper(motif)
   L <- nchar(motif)
-  if (method == "markov" && (order > L - 2)) stop(sprintf("Error: For motif %s (length %d), order must be <= %d", motif, L, L - 2))
+  if (method == "markov" && (order > L - 2)) 
+    stop(sprintf("Error: For motif %s (length %d), order must be <= %d", motif, L, L - 2))
   
-  # Load sequences
-  dna_sequences <- lapply(fasta_files, load_fasta_sequence)
+  # Find motif positions and precompute counts
   motif_positions_list <- lapply(dna_sequences, find_motif_positions, motif)
-  motif_counts_list <- mapply(precompute_motif_counts, motif_positions_list, sapply(dna_sequences, length), MoreArgs = list(step_size), SIMPLIFY = FALSE)
+  motif_counts_list <- mapply(precompute_motif_counts, motif_positions_list, 
+                              sapply(dna_sequences, length), MoreArgs = list(step_size), SIMPLIFY = FALSE)
   
-  # Extract FASTA file base names without extension
-  fasta_names <- tools::file_path_sans_ext(basename(fasta_files))
-  
-  # Chromosome data for plotting using FASTA file names
+  # Chromosome data for plotting using sequence names
   chr_lengths <- sapply(dna_sequences, length)
   df <- data.frame(
-    name = fasta_names,
+    name = sequence_names,
     start = cumsum(c(1, head(chr_lengths, -1))),
     end = cumsum(chr_lengths)
   )
@@ -235,7 +254,8 @@ for (motif in motifs) {
   col_fun <- colorRamp2(c(-10, -5, 0, 5, 10), c("blue", "navy", "green", "red", "darkred"))
   
   # Process windows in parallel
-  results_list <- mclapply(window_sizes, process_window_size, dna_sequences, motif, step_size, method, order, motif_counts_list, fasta_names, mc.cores = num_cores)
+  results_list <- mclapply(window_sizes, process_window_size, dna_sequences, motif, step_size, 
+                           method, order, motif_counts_list, sequence_names, mc.cores = num_cores)
   
   # Plot tracks
   for (results in results_list) {
@@ -244,7 +264,8 @@ for (motif in motifs) {
       circos.genomicRect(region, value, col = col_fun(value[[1]]), border = NA, ...)
     })
   }
-  draw(Legend(col_fun = col_fun, title = "Motif Z-Score", direction = "vertical"), x = unit(0.9, "npc"), y = unit(0.5, "npc"))
+  draw(Legend(col_fun = col_fun, title = "Motif Z-Score", direction = "vertical"), 
+       x = unit(0.9, "npc"), y = unit(0.5, "npc"))
   circos.clear()
   dev.off()
   
@@ -258,19 +279,19 @@ for (motif in motifs) {
   }
   close(file_conn)
   
-  # Summary statistics per FASTA file
+  # Summary statistics per sequence
   for (i in seq_along(window_sizes)) {
     results <- results_list[[i]]
-    summary_per_file <- results %>%
+    summary_per_sequence <- results %>%
       group_by(chrom) %>%
       summarize(mean_z = mean(z_score),
                 num_sig = sum(abs(z_score) > 2))
     summary_df <- rbind(summary_df, data.frame(
       motif = motif,
       window_size = window_sizes[i],
-      fasta_file = summary_per_file$chrom,
-      mean_z = summary_per_file$mean_z,
-      num_sig = summary_per_file$num_sig
+      sequence = summary_per_sequence$chrom,
+      mean_z = summary_per_sequence$mean_z,
+      num_sig = summary_per_sequence$num_sig
     ))
   }
 }
