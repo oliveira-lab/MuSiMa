@@ -5,7 +5,7 @@ This repository contains an R script (`musima.R`) designed to analyze DNA sequen
 ## Purpose
 MuSiMa:
 - Identifies positions of user-specified motifs across multiple DNA sequences provided in FASTA format or a single multi-sequence FASTA file.
-- Calculates observed versus expected motif occurrences in sliding windows of varying sizes (user defined) with a given step (also user defined). Innermost layer corresponds to the smallest window size. The expected motif occurrence is computed either as i) the product of the genome-wide motif frequency and the number of potential motif sites within each window, under a null model of uniform random distribution across the sequence; or ii) using a Markov chain of a specified order through sequence transition probabilities (maximum order allowed is L-2, where L is the motif's length).
+- Calculates observed versus expected motif occurrences in sliding windows of varying sizes (user defined) with a given step (also user defined). Innermost layer corresponds to the smallest window size. The expected motif occurrence is computed either as i) the product of the genome-wide motif frequency and the number of potential motif sites within each window, under a null model of uniform random distribution across the sequence; or ii) using a Markov chain of a specified order through sequence transition probabilities (maximum order allowed is L-2, where L is the motif's length). If motif is palindromic, only one set of layers is produced. Otherwise two sets of layers will be produced (sense + antisense strands).
 - Computes z-scores to assess statistical significance of motif enrichment or depletion.
 - Generates circular visualizations saved as a PDF file (`musima_plot_MOTIF.pdf`), prints the raw z-score values for each window (`results_list_MOTIF.txt`), and a summary file (`summary_stats.txt`) providing mean z-scores and significant (|z|>2) window counts per motif and FASTA file.
 
@@ -43,7 +43,7 @@ MuSiMa automatically checks for and installs the following R packages if they ar
    Rscript musima.R -f file1.fa,file2.fa -m Motif1,Motif2 -w window_size1,window_size2,...,window_sizeN -s step_size -t uniform -o NA -c 4
 
 ## Output
-A PDF file named musima_plot_MOTIF.pdf containing a circular plot of z-scores across chromosomes for multiple window sizes and a given step size (user defined). Auxiliary results_list_MOTIF.txt and summary_stats.txt files are also produced.
+A PDF file named musima_plot_MOTIF.pdf containing a circular plot of z-scores across chromosomes for multiple window sizes and a given step size (user defined). Auxiliary results_list_MOTIF.txt and summary_stats.txt files are also produced. If motif is palindromic, only one set of layers is produced. Otherwise two sets of layers will be produced (sense + antisense strands).
 
 ![Output Musima](/test/musima_plot_GATC.jpg "GATC distribution across E. coli MG1655, R. solanacearum GMI1000, and C. difficile 630")
 
