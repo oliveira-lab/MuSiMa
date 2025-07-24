@@ -45,9 +45,9 @@ MuSiMa automatically checks for and installs the following R packages if they ar
 ## Output
 A PDF file named musima_plot_MOTIF.pdf containing a circular plot of z-scores across chromosomes for multiple window sizes and a given step size (user defined). Auxiliary results_list_MOTIF.txt and summary_stats.txt files are also produced. If motif is palindromic, only one set of layers is produced. Otherwise two sets of layers will be produced (sense + antisense strands).
 
-![Output Musima](/test/musima_plot_GATC.jpg "GATC distribution across E. coli MG1655, R. solanacearum GMI1000, and C. difficile 630")
+![Output Musima](/test/musima_plot_CAAAAA.jpg "CAAAAA distribution across E. coli MG1655 and R. solanacearum GMI1000")
 
-In this example, we produced a circular plot of z-scores for GATC over / under abundance in the main chromosomes of <em>E. coli</em> MG1655, <em>R. solanacearum</em> GMI1000, and <em>C. difficile</em> 630 using window sizes 500000, 400000, 300000, 200000, 100000, 90000, 80000, 70000, 60000, 50000, a step size of 10000, and a 'uniform' background model.
+In this example, we produced a circular plot of z-scores for CAAAAA over / under abundance in the main chromosomes of <em>E. coli</em> MG1655 and <em>R. solanacearum</em> GMI1000 using window sizes 500000, 250000, 100000, 90000, 80000, 70000, 50000, a step size of 10000, and a 'uniform' background model.
 
 ## License and citing
 This project is licensed under a GPL-3.0 License. See the LICENSE file for details. Please cite MuSiMa by including the link to https://github.com/oliveira-lab/musima.git.
