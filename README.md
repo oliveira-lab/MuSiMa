@@ -70,7 +70,7 @@ MuSiMa automatically checks for and installs the following R packages if they ar
      Rscript musima.R -f difficile.fasta --bed TFBS.bed -w 500000,250000,100000,90000,80000,70000,50000 -s 10000 --randomization 200 -c 4 --plotrange=-5,5
      ```
 
-     ![MuSiMa Output](/test/musima_plot_TFBS.jpg "TFBS distribution across *C. difficile* 630")
+     ![MuSiMa Output](/test/musima_plot_TFBS.jpeg "TFBS distribution across *C. difficile* 630")
 
 ## Output
 Multiple files are produced:
