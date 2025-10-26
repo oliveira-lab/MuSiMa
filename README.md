@@ -58,7 +58,7 @@ MuSiMa automatically checks for and installs the following R packages if they ar
 
    - Distribution of "GTWWAC" and "RAATTY" in *E. coli* MG1655 and *R. solanacearum* GMI1000 using as background a markov model of order 4:
      ```bash
-     Rscript musima.R -f coli.fa,solanacearum.fa -m GTWWAC,AGACG-w 500000,250000,100000,90000,80000,70000,50000 -s 10000 -t markov -o 4 -c 4 --plotrange=-5,5
+     Rscript musima.R -f coli.fa,solanacearum.fa -m GTWWAC,AGACG -w 500000,250000,100000,90000,80000,70000,50000 -s 10000 -t markov -o 4 -c 4 --plotrange=-5,5
      ```
 
      ![MuSiMa Output](/test/musima_plot_multimotif.jpg "GTWWAC and AGACG distribution across *E. coli* MG1655 and *R. solanacearum* GMI1000")
