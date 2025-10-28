@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-# --- Install and Load Required Packages ---
+# ---- Install and Load Required Packages ----
 required_packages <- c("seqinr", "circlize", "dplyr", "Biostrings", "ComplexHeatmap", "parallel", "optparse", "logger")
 for (pkg in required_packages) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
@@ -32,7 +32,7 @@ suppressPackageStartupMessages({
   })
 })
 
-# --- Define Command-Line Options ---
+# ---- Define Command-Line Options ----
 option_list <- list(
   make_option(c("-f", "--fasta"), type = "character", 
               help = "For motif mode: Comma-separated list of FASTA files (each can be a multifasta file). For Signal mode: Single FASTA file containing chromosome sequences."),
@@ -60,7 +60,7 @@ option_list <- list(
 parser <- OptionParser(option_list = option_list, description = "MuSiMa: Motif and region enrichment analysis.\nMotif mode: Scan for motif occurrences in sliding windows.\nSignal mode: Analyze region enrichment with randomization. In Signal mode, p-values are empirical two-tailed.")
 args <- parse_args(parser)
 
-# --- Extract and Validate Arguments ---
+# --- Extract and Validate Arguments ----
 fasta_files <- if (!is.null(args$fasta)) strsplit(args$fasta, ",")[[1]] else NULL
 motif_input <- args$motif
 window_sizes <- if (!is.null(args$windows)) as.numeric(strsplit(args$windows, ",")[[1]]) else NULL
@@ -136,7 +136,7 @@ if (!is_signal_mode) {
   }
 }
 
-# --- Function Definitions ---
+# ---- Function Definitions ----
 
 # Load sequences from FASTA files
 load_all_sequences <- function(fasta_files) {
@@ -306,7 +306,7 @@ is_palindromic <- function(motif) {
   return(motif == rc_motif)
 }
 
-# --- Helper functions for Signal mode ---
+# --- Helper functions for Signal mode ----
 
 # Read BED with 4 columns (ID, start, end, strand). Start assumed 1-based.
 read_bed4 <- function(bed_path) {
@@ -384,7 +384,7 @@ global_to_chr <- function(pos, chr_offsets) {
   chr_offsets$name[idx]
 }
 
-# --- Signal Mode Implementation ---
+# ---- Signal Mode Implementation --------
 if (is_signal_mode) {
   log_info("Starting Signal mode analysis")
   cat("Computing. Please wait...\n")
@@ -649,7 +649,7 @@ if (is_signal_mode) {
   quit(save = "no", status = 0)
 }
 
-# --- Main processing loop for motif mode ---
+# ---- Main processing loop for motif mode ----
 log_info("Starting motif mode analysis")
 cat("Computing. Please wait...\n")
 summary_df <- data.frame()
@@ -835,3 +835,4 @@ summary_file <- timestamped_filename("motif_summary_stats", ".txt")
 write.table(summary_df, summary_file, sep = "\t", quote = FALSE, row.names = FALSE)
 log_info("Analysis complete. Plots and results saved for each motif")
 cat("Analysis complete. Plots and results saved for each motif.\n")
+                          
